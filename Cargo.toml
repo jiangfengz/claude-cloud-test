@@ -1,0 +1,23 @@
+[package]
+name = "hourglass"
+version = "0.1.0"
+edition = "2024"
+description = "Deterministic simulation testing for a Raft-replicated KV store: seeded chaos, a linearizability checker, and automatic shrinking of failing schedules"
+license = "MIT"
+readme = "README.md"
+keywords = ["raft", "simulation", "linearizability", "testing", "distributed-systems"]
+categories = ["development-tools::testing", "simulation"]
+
+[dependencies]
+
+[[bin]]
+name = "hourglass"
+path = "src/main.rs"
+
+# The test suite runs hundreds of full cluster simulations; unoptimised builds
+# make that needlessly slow.
+[profile.test]
+opt-level = 2
+
+[profile.dev]
+opt-level = 1
