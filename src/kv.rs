@@ -49,7 +49,7 @@ impl KvOp {
             }
             OpKind::Cas { expect, new } => {
                 h.mix(2);
-                h.mix(expect.map_or(u64::MAX, |e| e));
+                h.mix(expect.unwrap_or(u64::MAX));
                 h.mix(new);
             }
         }
