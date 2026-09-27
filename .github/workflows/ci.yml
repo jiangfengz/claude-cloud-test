@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --check
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Tests
+        run: cargo test
+      - name: Docs
+        run: cargo doc --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Every run replays bit-for-bit
+        run: ./target/release/hourglass determinism --seeds 20
+
+      - name: Correct Raft survives 2000 random universes
+        run: ./target/release/hourglass fuzz --seeds 2000 --no-color
+
+      - name: An injected bug is found and shrunk
+        run: |
+          if ./target/release/hourglass fuzz --seeds 300 --bug stale-read --no-color --html shrunk-report.html; then
+            echo "::error::stale-read was not detected"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shrunk-report
+          path: shrunk-report.html

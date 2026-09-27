@@ -2,6 +2,7 @@
 name = "hourglass"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.88"
 description = "Deterministic simulation testing for a Raft-replicated KV store: seeded chaos, a linearizability checker, and automatic shrinking of failing schedules"
 license = "MIT"
 readme = "README.md"
